@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <base href="/">
+  <title>TimeToLift</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="../views/styles/styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <div class="jumbotron">
+      <h1 class="textbox">Lifts Today</h1>
+    </div>
+    <!--Selectable lift types-->
+    <div class="hflex">
+      <div class="jumbotron hflex-item button">
+        <p>7:30</p>
+      </div>
+      <div class="jumbotron hflex-item button">
+        <p>8:30</p>
+      </div>
+    </div>
+
+    <!--Main "I AM AWAKE" button-->
+    <div class="jumbotron button not-awake" id="main-awake-button">
+      <p>I'M SCHLEEP</p>
+    </div>
+    <div class="hflex-center">
+      <h4>ROOMMATES</h4>
+    </div>
+    <!-- Roommate card container -->
+    <div id="roommate-card-container" class="hflex">
+
+    </div>
+  </div>
+
+  
+
+  <%- include('./roommate.ejs'); -%>
+  <button id="testbutton">
+    Click me
+  </button>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  <script src="../views/component_controls.js"></script>
+
+</body>
+
+</html>
