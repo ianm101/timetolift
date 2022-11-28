@@ -1,4 +1,10 @@
+// Landing page
+// Sign-in logic
+// 1. Either they have info saved, and login right away
+// 2. They are registered but need to enter info
 
+// Registration Logic
+// 1. They need to sign up and be added to appropriate team
 // Handle toggling of active/inactive for buttons
 $(document).ready(function () {
     $(".button").click(function () {
@@ -29,6 +35,9 @@ $(document).ready(function(){
     // Change text depending on state
 });
 
+
+// ------- TO BE REMOVED ----------------
+// Adds a new roommate card to the page
 $(document).ready(function(){
     $("#testbutton").click(function(){
         var temp = $("template");

@@ -1,3 +1,9 @@
+/* Landing page */
+#landing-signin {
+    background-color: #323ca8;
+    color: white;
+}
+
 .textbox {
     text-align: center;
 }
@@ -15,6 +21,11 @@ body {
     display: flex;
     flex-direction: column;
     row-gap: 20px;
+}
+.vflex-biggap {
+    display: flex;
+    flex-direction: column;
+    row-gap: 100px;
 }
 
 .hflex-item{

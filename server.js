@@ -17,7 +17,8 @@ app.get("/", (req, res) => {
     // res.render("index");
 
     // Pass data into views (html/ejs files) with render()'s second parameter
-    res.render("index", {text: "World!"});
+    //res.render("index");
+    res.render("landing");
 });
 
 app.get("/team", (req, res) => {
