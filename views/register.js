@@ -3,12 +3,13 @@ $(document).ready(function(){
         var formData = {
             name: $('input[name="reg-name"]').val(),
             phone_number: $('input[name="reg-phone_number"]').val(),
-            team: $('input[name="reg-team"]').val()
+            team: $('select[name="reg-team"]').val(),
+            year: $('select[name="reg-year"]').val()
         };
 
         $.ajax({
             type: "POST", 
-            url: "/registration_ajax",
+            url: "/register",
             data: formData,
             dataType: "json",
             encode: true

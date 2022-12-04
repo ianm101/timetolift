@@ -14,7 +14,7 @@ const pool = new Pool({
 /* ------------------ CONSTRUCTION FUNCTIONS ------------------ */
 function createTables(pool){
 
-    pool.query("DROP TABLE IF EXISTS users; CREATE TABLE IF NOT EXISTS users(username text, phone_number text, team text, awake boolean, roommates text[], lifttime text);")
+    pool.query("DROP TABLE IF EXISTS users; CREATE TABLE IF NOT EXISTS users(username text, phone_number text, year text, team text, awake boolean, roommates text[], lifttime text);")
     .then((res) => {
         console.log("Success");
     })
@@ -32,8 +32,8 @@ function createNewUser(client, userData) {
     let roommates = userData['roommates'];
     let team = userData['team'];
 
-    let createUserTemplateString = `INSERT INTO users(name, status, year, lifttime, phone_number, roommates, team) VALUES($1, $2, $3, $4, $5, $6, $7);`;
-    let createUserValues = [name, status, year, lifttime, phone_number, roommates, team];
+    let createUserTemplateString = `INSERT INTO users(username, phone_number, year, team, awake, roommates, lifttime) VALUES($1, $2, $3, $4, $5, $6, $7);`;
+    let createUserValues = [name, phone_number, year, team, status, roommates, lifttime];
 
     console.log(createUserValues);
     client.query(
@@ -225,3 +225,4 @@ if (require.main === module) {
 module.exports.pool = pool;
 module.exports.getAllUsersByTeam = getAllUsersByTeam;
 module.exports.getUserByNameAndNumber = getUserByNameAndNumber;
+module.exports.createNewUser = createNewUser;

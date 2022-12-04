@@ -1,4 +1,4 @@
-$(document).ready(function(){
+/*$(document).ready(function(){
     $("#signin-form").submit((e) => {
         e.preventDefault();
         var formData = $("#signin-form").serializeArray().reduce((obj, item) => {
@@ -26,3 +26,4 @@ $(document).ready(function(){
         });
     })
 });
+*/

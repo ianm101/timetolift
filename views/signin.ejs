@@ -4,7 +4,12 @@
         <title>[TTL] Sign-in</title>
     </head>
     <body>
-        <form id="signin-form" action="POST">
+        <% if(message){ %>
+        <div class="alert <%= messageClass %>" role="alert">
+            <%= message %>
+        </div>
+        <% } %>
+        <form id="signin-form" method="POST">
             <label for="signin-name">Name</label>
             <input name="signin-name">
             <label for="signin-phone_number">Phone Number</label>

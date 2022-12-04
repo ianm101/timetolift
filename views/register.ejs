@@ -1,21 +1,40 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>
+
+<head>
+    <title>
         TimeToLift
     </title>
-    </head>
-    <body>
-        <form id="registration-form">
-            <label for="reg-name">Name</label>
-            <input name="reg-name">
-            <label for="reg-phone_number">Phone Number</label>
-            <input name="reg-phone_number">
-            <label for="reg-team">Team</label>
-            <input name="reg-team">
-            <button type="submit">Submit</button>
-        </form>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-    <script src="/views/register.js" type="application/javascript"></script>
-    </body>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+    <% if(message){ %>
+        <div class="alert <%= messageClass %>" role="alert">
+            <%= message %>
+        </div>
+        <% } %>
+            <form id="registration-form">
+                <label for="reg-name">Name:</label>
+                <input name="reg-name">
+                <label for="reg-phone_number">Phone Number</label>
+                <input name="reg-phone_number">
+                <label for="reg-team">Team:</label>
+                <select name="reg-team">
+                    <option value="mlx">MLX</option>
+                </select>
+                <label for="reg-year">Year:</label>
+                <select name="reg-year">
+                    <option value="freshman">Freshman</option>
+                    <option value="sophomore">Sophomore</option>
+                    <option value="junior">Junior</option>
+                    <option value="senior">Senior</option>
+                </select>
+                <button type="submit">Submit</button>
+            </form>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+            <script src="/views/register.js" type="application/javascript"></script>
+</body>
+
 </html>
