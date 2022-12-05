@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>[TTL] Profile Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="../views/styles/styles.css">
+</head>
+
+<body>
+    <%- include('./micro_roommate.ejs'); -%>
+    <% if(locals.message){ %>
+        <div class="alert <%= locals.messageClass %>" role="alert">
+            <%= locals.message %>
+        </div>
+        <% } %>
+            <div>
+                <form method="POST" id="profile-form" action="/profile">
+                    <div class="vflex">
+                        <div class="hflex">
+                            <label for="profile-name">Name</label>
+                            <input name="profile-name">
+                        </div>
+                        <div class="hflex">
+                            <label for="profile-phone_number">Phone Number</label>
+                            <input name="profile-phone_number">
+                        </div>
+                        <div class="hflex">
+                            <label for="profile-year">Year</label>
+                            <select name="profile-year">
+                                <option value="freshman">Freshman</option>
+                                <option value="sophomore">Sophomore</option>
+                                <option value="junior">Junior</option>
+                                <option value="senior">Senior</option>
+                            </select>
+                        </div>
+                        <div class="hflex">
+                            <label for="profile-team">Team</label>
+                            <select name="profile-team">
+                                <option value="mlx">MLX</option>
+                            </select>
+                        </div>
+                        <div class="hflex">
+                            <label for="profile-lifttime">Preferred Lift Time</label>
+                            <select name="profile-lifttime">
+                                <option value="7:30">7:30am</option>
+                                <option value="8:30">8:30am</option>
+                            </select>
+                        </div>
+                        <div class="hflex" id="add-roommate-div">
+
+                            <label for="roommate-datalist">Add a Roommate:</label>
+                            <input list="all-roommates" id="roommate-datalist" name="roommate-datalist" placeholder="Search for a teammate">
+                            <datalist id="all-roommates">
+                                <% if(locals.dataAllTeammates){ %>
+                                <% let teammatesRaw = Object.values(locals.dataAllTeammates); %>
+                                <% let teammates = Object.values(teammatesRaw); %>
+                                <% for(let i = 0; i < teammates.length; i++) { %>
+                                    <option value='<%- teammates[i].username %>'>
+                                <% } %>
+                                <% } %>
+                            </datalist>
+                            <div class="hflex" id="roommate-alert-div">
+                            
+                            </div>
+                            <button id="add-roommate-btn" class="btn-primary" type="button">Add Roommate</button>
+
+                        </div>
+                        
+                        <div class="hflex" id="micro-roommate-container">
+
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+            <script src="/views/profile.js" type="application/javascript"></script>
+
+</body>
+<% if(typeof user !==undefined) { %>
+    <script>
+        var username = '<%- JSON.stringify(locals.dataName).slice(1,-1) %>'
+        var phone_number = '<%- JSON.stringify(locals.dataPhoneNumber).slice(1,-1) %>'
+        var year = '<%- JSON.stringify(locals.dataYear).slice(1, -1) %>'
+        var team = '<%- JSON.stringify(locals.dataTeam).slice(1, -1) %>'
+        var roommates = '<%- JSON.stringify(locals.dataRoommates) %>'
+        var lifttime = '<%- JSON.stringify(locals.dataLifttime).slice(1, -1) %>'
+    </script>
+    <% } %>
+
+</html>

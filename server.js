@@ -7,6 +7,7 @@ const crypto = require("crypto");
 
 const app = express();
 const dbm = require("./db_methods");
+const { url } = require("inspector");
 const pool = dbm.pool;
 
 
@@ -37,6 +38,9 @@ app.use(session({
 
 // Cookie parser
 app.use(cookieParser());
+
+app.use(jsonParser);
+app.use(urlencodedParser);
 
 // Pass authentication per request/response step
 app.use((req, res, next) => {
@@ -103,18 +107,103 @@ app.get("/landing", (req, res) => {
 });
 
 app.get("/signin", (req, res) => {
-    res.render("signin");
+    if (req.session.loggedin) {
+        res.render("index");
+    } else {
+        res.render("signin", {
+            message: "",
+            messageClass: ""
+        });
+    }
 })
+app.get("/profile", (req, res) => {
+    let currentUser = req.session.user;
+    if (typeof currentUser === undefined) {
+        res.render("signin", {
+            message: "No active user. Please login",
+            messageClass: "alert-danger"
+        })
+    } else {
+        let queriedUser = dbm.getUserByName(pool, currentUser);
+        queriedUser.then((data) => {
+            console.log("Profile")
+            let userData = data[0];
+            let allTeammates = dbm.getAllUsersByTeam(pool, userData['team']);
+            allTeammates.then((allTeammatesData) => {
+                res.render("profile", {
+                    user: currentUser,
+                    dataName: userData['username'],
+                    dataPhoneNumber: userData['phone_number'],
+                    dataYear: userData['year'],
+                    dataTeam: userData['team'],
+                    dataRoommates: userData['roommates'],
+                    dataLifttime: userData['lifttime'],
+                    dataAllTeammates: Object.values(allTeammatesData)
+                });
+            });
+        })
 
+    }
+})
+app.post("/profile", urlencodedParser, (req, res) => {
+    let currentUser = req.session.user;
+    if (typeof currentUser === undefined) {
+        res.render("signin", {
+            message: "No active user. Please login",
+            messageClass: "alert-danger"
+        })
+    } else {
+        let queriedUser = dbm.getUserByName(pool, currentUser);
+        queriedUser.then((data) => {
+            console.log("Profile")
+            let userData = data[0];
+            let allTeammates = dbm.getAllUsersByTeam(pool, userData['team']);
+
+            // Update database with new values
+            dbm.updateUser(pool, userData).then(() => {
+                allTeammates.then((allTeammatesData) => {
+                    res.render("profile", {
+                        user: currentUser,
+                        dataName: userData['username'],
+                        dataPhoneNumber: userData['phone_number'],
+                        dataYear: userData['year'],
+                        dataTeam: userData['team'],
+                        dataRoommates: userData['roommates'],
+                        dataLifttime: userData['lifttime'],
+                        dataAllTeammates: Object.values(allTeammatesData)
+                    });
+                });
+            })
+            .catch((err) => console.error(err.message));
+
+        })
+
+    }
+});
 // AJAX
 app.post("/signin", urlencodedParser, (req, res) => {
-    let data = req.body;
-    let name = data['signin-name'];
-    let phone_number = data['signin-phone_number'];
+    const name = req.body['signin-name'];
+    const phone_number = req.body['signin-phone_number'];
 
-    app.post("/auth", jsonParser, (req, res) => {
+    // Check that entered credentials match one in system
+    let queriedUser = dbm.getUserByNameAndNumber(pool, name, phone_number);
+    queriedUser.then((data) => {
+        if (data.length === 0) {
+            res.render('signin', {
+                message: "Invalid credentials. Please try again",
+                messageClass: "alert-danger"
+            });
+        } else {
+            req.session.loggedin = true;
+            req.session.user = name;
+            res.render("index", {
+                message: `Welcome back, ${name}`,
+                messageClass: 'alert-info'
+            });
+        }
+    })
 
-    });
+
 });
 
 app.get("/register", (req, res) => {
@@ -125,20 +214,18 @@ app.get("/register", (req, res) => {
 })
 
 app.post("/register", urlencodedParser, (req, res) => {
-    const { name, phone_number, team, year } = req.body;
-    console.log(`Name: ${name}`);
-    console.log(`Phone Number: ${phone_number}`);
-    console.log(`Team: ${team}`);
-    console.log(`Year: ${year}`);
+
+
+    const name = req.body['reg-name'];
+    const phone_number = req.body['reg-phone_number'];
+    const team = req.body['reg-team'];
+    const year = req.body['reg-year'];
 
     // Check for existing user
     let queriedUser = dbm.getUserByNameAndNumber(pool, name, phone_number);
-    console.log("Pre then")
     queriedUser.then((data) => {
-        console.log("Within then");
         // if no existing user, then create a new user and redirect to login:
         if (data.length === 0) {
-            console.log("within if");
             // Create new user
             let userData = {
                 name: name,
@@ -152,22 +239,19 @@ app.post("/register", urlencodedParser, (req, res) => {
             dbm.createNewUser(pool, userData);
 
             res.render("signin", {
-                message: "New user created. Please login",
+                message: "Registration complete. Please login",
                 messageClass: "alert-success"
             });
         }
         // Otherwise, we already have a user with this information. Alert them
         else {
-            console.log("within elese");
-            res.redirect(301, 'signin', {
+            res.render('signin', 200, {
                 message: 'User with this information is already registered.',
                 messageClass: 'alert-danger'
             });
-            console.log("after render");
         }
     })
-    .catch((err) => console.error(err.message));
-    console.log("GOT HERE");
+        .catch((err) => console.error(err.message));
 
     // add new user to database
 

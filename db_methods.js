@@ -4,23 +4,23 @@ const pool = new Pool({
     host: "ttl-free.cynfno9kq8qj.us-east-1.rds.amazonaws.com",
     port: 5432,
     user: "postgres",
-    password:"TimeToLift",
+    password: "TimeToLift",
     max: 20,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis:2000
+    connectionTimeoutMillis: 2000
 });
 
 
 /* ------------------ CONSTRUCTION FUNCTIONS ------------------ */
-function createTables(pool){
+function createTables(pool) {
 
     pool.query("DROP TABLE IF EXISTS users; CREATE TABLE IF NOT EXISTS users(username text, phone_number text, year text, team text, awake boolean, roommates text[], lifttime text);")
-    .then((res) => {
-        console.log("Success");
-    })
-    .catch((err) => {
-        console.error(err.message);
-    });
+        .then((res) => {
+            console.log("Success");
+        })
+        .catch((err) => {
+            console.error(err.message);
+        });
 }
 
 function createNewUser(client, userData) {
@@ -75,7 +75,7 @@ function getAllUsers(client) {
     return retData;
 }
 
-function getUserByNameAndNumber(pool, name, phone_number){
+function getUserByNameAndNumber(pool, name, phone_number) {
     let query = {
         text: "SELECT * FROM users WHERE username = $1 AND phone_number = $2;",
         rowMode: "array"
@@ -83,39 +83,39 @@ function getUserByNameAndNumber(pool, name, phone_number){
     let values = [name, phone_number];
     let retData;
     return pool.query(query, values)
-    .then((res) => {
-        const data = res;
-        retData = data.rows;
-        return retData;
-    })
-    .catch((err) => {
-        console.error(err);
-        retData = null;
-    });
+        .then((res) => {
+            const data = res;
+            retData = data.rows;
+            return retData;
+        })
+        .catch((err) => {
+            console.error(err);
+            retData = null;
+        });
     // .finally(() => {
     //     console.log("Done with getUserByNameAndNumber query");
     // });
 }
-function getUserByName(client, name) {
+function getUserByName(pool, name) {
     let query = {
-        text: "SELECT * FROM users WHERE name = $1",
+        text: "SELECT * FROM users WHERE username = $1",
     }
     let values = [name];
     let retData;
-    client.query(query, values).then(res => {
-        const data = res.rows;
-        retData = data;
-    })
+    return pool.query(query, values)
+        .then(res => {
+            const data = res.rows;
+            return data;
+        })
         .catch(e => {
             console.error(e.stack);
         })
         .finally(() => {
             console.log("Done with getUserByName query");
         });
-    return retData;
 }
 
-function getUserByPhoneNumber(client, phone_number){
+function getUserByPhoneNumber(client, phone_number) {
     let query = {
         text: "SELECT * FROM users WHERE phone_number = $1",
     }
@@ -124,12 +124,12 @@ function getUserByPhoneNumber(client, phone_number){
         const data = res.rows;
         return data;
     })
-    .catch(e => {
-        console.error(e.stack);
-    })
-    .finally(() => {
-        console.log("Done with getUserByPhoneNumber query");
-    });
+        .catch(e => {
+            console.error(e.stack);
+        })
+        .finally(() => {
+            console.log("Done with getUserByPhoneNumber query");
+        });
 }
 
 function getUsersByClassYear(client, classYear) {
@@ -150,28 +150,26 @@ function getUsersByClassYear(client, classYear) {
         });
 }
 
-function getAllUsersByTeam(pool, team){
+function getAllUsersByTeam(pool, team) {
     let query = {
         text: 'SELECT * FROM users WHERE team = $1',
     }
     let values = [team];
     let retData;
-    pool.query(query, values).then(res => {
+    return pool.query(query, values).then(res => {
         const data = res.rows;
-        console.log(`Data: ${data}`);
-        retData = data;
+        return data;
     })
-    .catch(e => {
-        console.error(`[getAllUsersByTeam] ${e.message}`);
-    })
-    .finally(() => {
-        console.log("Done with getAllUsersByTeam Query");
-    });
-    return retData;
+        .catch(e => {
+            console.error(`[getAllUsersByTeam] ${e.message}`);
+        })
+        .finally(() => {
+            console.log("Done with getAllUsersByTeam Query");
+        });
 }
 
 
-function createClient(){
+function createClient() {
     const cxnString = process.env.PG_CXN_STR;
 
     const client = new Client({
@@ -181,6 +179,29 @@ function createClient(){
         }
     });
     return client;
+}
+
+// -------------------------- UPDATE FUNCTIONS ----------------------------
+function updateUser(pool, userData){
+    let query = {
+        text: 'UPDATE users SET "username" = $1, "phone_number" = $2, "team" = $3, "year" = $4, "lifttime" = $5, "roommates" = $6 WHERE "username" = $1;',
+    }
+    let values = [userData['name'], userData['phone_number'], userData['team'], userData['year'], userData['lifttime'], userData['roommates']];
+    console.log(`Valeus: ${values}`);
+    let retData;
+    return pool.query(query, values).then(res => {
+        const data = res.rows;
+        pool.query("SELECT * FROM users WHERE username='Wes Carp';").then((res) => {
+            console.log(res.rows);
+        });
+        return data;
+    })
+        .catch(e => {
+            console.error(`[updateUser] ${e.message}`);
+        })
+        .finally(() => {
+            console.log("Done with updateUser Query");
+        });
 }
 
 if (require.main === module) {
@@ -226,3 +247,5 @@ module.exports.pool = pool;
 module.exports.getAllUsersByTeam = getAllUsersByTeam;
 module.exports.getUserByNameAndNumber = getUserByNameAndNumber;
 module.exports.createNewUser = createNewUser;
+module.exports.getUserByName = getUserByName;
+module.exports.updateUser = updateUser;

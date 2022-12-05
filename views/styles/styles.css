@@ -4,7 +4,12 @@
 body {
     padding: 20px;
 }
-
+.profile-link{
+    position: sticky;
+    top: 30;
+    right: 30;
+    /* border: 3px solid black; */
+}
 .hflex {
     display: flex;
     flex-direction: row;
@@ -26,7 +31,25 @@ body {
     flex-direction: row;
     justify-content: center;
 }
-
+.micro-roommate {
+    border-color: black;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 15px;
+    max-width: 500px;
+    width: 300px;
+    height: 75px;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+#micro-roommate-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    width: 30%;
+}
 .button {
     font-size: 30px;
     text-align: center;

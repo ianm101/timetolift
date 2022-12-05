@@ -6,16 +6,17 @@
         TimeToLift
     </title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="../views/styles/styles.css">
 </head>
 
 <body>
-    <% if(message){ %>
-        <div class="alert <%= messageClass %>" role="alert">
-            <%= message %>
+    <% if(locals.message){ %>
+        <div class="alert <%= locals.messageClass %>" role="alert">
+            <%= locals.message %>
         </div>
         <% } %>
-            <form id="registration-form">
+            <form id="registration-form" method="POST" action="/register">
                 <label for="reg-name">Name:</label>
                 <input name="reg-name">
                 <label for="reg-phone_number">Phone Number</label>
