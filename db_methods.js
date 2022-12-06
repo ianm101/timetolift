@@ -186,7 +186,7 @@ function updateUser(pool, userData){
     let query = {
         text: 'UPDATE users SET "username" = $1, "phone_number" = $2, "team" = $3, "year" = $4, "lifttime" = $5, "roommates" = $6 WHERE "username" = $1;',
     }
-    let values = [userData['name'], userData['phone_number'], userData['team'], userData['year'], userData['lifttime'], userData['roommates']];
+    let values = [userData['name'], userData['phone_number'], userData['team'], userData['year'], userData['lifttime'], userData['roommates[]']];
     console.log(`Valeus: ${values}`);
     let retData;
     return pool.query(query, values).then(res => {
@@ -204,8 +204,45 @@ function updateUser(pool, userData){
         });
 }
 
+function toggleAwake(pool, user){
+    let query = {
+        text: 'UPDATE users SET awake = NOT awake WHERE username = $1 RETURNING awake;'
+    }
+    let values = [user];
+    return pool.query(query, values)
+    .then(res => {
+        console.log("Successful toggle awake");
+        return res.rows
+    })
+    .catch(err => console.error(err.message))
+}
+
+function dangerousResetUsers(pool){
+    let query = {
+        text: "DELETE FROM users;"
+    }
+    pool.query(query)
+    .then(res => console.log("Successfully deleted all records in users table."))
+    .catch(e => console.error(e.message))
+    .finally(() => {
+        console.log("Done with dangerousResetUsers query");
+        pool.end();
+    })
+}
+
+function sandbox(pool){
+    let query = {
+        text: 'SELECT * FROM users;'
+    }
+    pool.query(query)
+    .then((res) => {
+        res.rows.map(x => console.log(x));
+    })
+    .catch((e) => console.error(e.message));
+}
+
 if (require.main === module) {
-    createTables(pool);
+    sandbox(pool);
     // // var teamData = require("./teamdata.json");
     // // for(let row in teamData){
     // //     createNewUser(teamData[row]);
@@ -249,3 +286,4 @@ module.exports.getUserByNameAndNumber = getUserByNameAndNumber;
 module.exports.createNewUser = createNewUser;
 module.exports.getUserByName = getUserByName;
 module.exports.updateUser = updateUser;
+module.exports.toggleAwake = toggleAwake;

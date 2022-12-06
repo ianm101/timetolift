@@ -155,12 +155,15 @@ app.post("/profile", urlencodedParser, (req, res) => {
     } else {
         let queriedUser = dbm.getUserByName(pool, currentUser);
         queriedUser.then((data) => {
-            console.log("Profile")
             let userData = data[0];
             let allTeammates = dbm.getAllUsersByTeam(pool, userData['team']);
-
+            console.log("userData");
+            console.dir(userData);
+            console.dir(req.body);
+            var formData = req.body;
+            console.log(formData["roommates[]"]);
             // Update database with new values
-            dbm.updateUser(pool, userData).then(() => {
+            dbm.updateUser(pool, formData).then(() => {
                 allTeammates.then((allTeammatesData) => {
                     res.render("profile", {
                         user: currentUser,
@@ -170,7 +173,9 @@ app.post("/profile", urlencodedParser, (req, res) => {
                         dataTeam: userData['team'],
                         dataRoommates: userData['roommates'],
                         dataLifttime: userData['lifttime'],
-                        dataAllTeammates: Object.values(allTeammatesData)
+                        dataAllTeammates: Object.values(allTeammatesData),
+                        message: "Profile data updated",
+                        messageClass: 'alert-success'
                     });
                 });
             })
@@ -288,6 +293,25 @@ app.get("/get_all_by_team", async (req, res) => {
 
     dbm.getAllUsersByTeam(pool, team);
 })
+
+app.post("/toggle_user_awake", urlencodedParser, async (req, res) => {
+    let currentUser = req.session.user;
+    if (typeof currentUser === undefined) {
+        res.render("signin", {
+            message: "No active user. Please login",
+            messageClass: "alert-danger"
+        })
+    } else {
+        dbm.toggleAwake(pool, currentUser)
+        .then((queryData) => {
+            console.log("In Server");
+            let isAwake = queryData[0]['awake'];
+            res.send({'query_success':true, 'isAwake':isAwake});
+        })
+        .catch(err => console.error(err.message))
+        .finally(() => {console.log("this is a test")});  
+    }
+});
 let port = 3000;
 console.log(`listening on port ${port}`);
 app.listen(port);
