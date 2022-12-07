@@ -14,7 +14,7 @@ const pool = new Pool({
 /* ------------------ CONSTRUCTION FUNCTIONS ------------------ */
 function createTables(pool) {
 
-    pool.query("DROP TABLE IF EXISTS users; CREATE TABLE IF NOT EXISTS users(username text, phone_number text, year text, team text, awake boolean, roommates text[], lifttime text);")
+    pool.query("DROP TABLE IF EXISTS users; CREATE TABLE IF NOT EXISTS users(username text, phone_number text, year text, team text, awake boolean, roommates text[], lifttime text, today_lifttime text);")
         .then((res) => {
             console.log("Success");
         })
@@ -32,8 +32,8 @@ function createNewUser(client, userData) {
     let roommates = userData['roommates'];
     let team = userData['team'];
 
-    let createUserTemplateString = `INSERT INTO users(username, phone_number, year, team, awake, roommates, lifttime) VALUES($1, $2, $3, $4, $5, $6, $7);`;
-    let createUserValues = [name, phone_number, year, team, status, roommates, lifttime];
+    let createUserTemplateString = `INSERT INTO users(username, phone_number, year, team, awake, roommates, lifttime, today_lifttime) VALUES($1, $2, $3, $4, $5, $6, $7, $8);`;
+    let createUserValues = [name, phone_number, year, team, status, roommates, lifttime, lifttime];
 
     console.log(createUserValues);
     client.query(
@@ -43,7 +43,7 @@ function createNewUser(client, userData) {
         console.log(`New user ${name} created in table.`);
     })
         .catch(e => {
-            console.error(e.stack)
+            console.error(`[createNewUser] Error ${e.message}`)
         });
 
 }
@@ -75,6 +75,19 @@ function getAllUsers(client) {
     return retData;
 }
 
+function getPreferredLifttimeByName(pool, name) {
+    let query = {
+        text: "SELECT lifttime FROM users WHERE username = $1;"
+    }
+    let values = [name];
+    return pool.query(query, values)
+        .then(res => {
+            return res.rows[0]
+        })
+        .catch(err => console.error(`[getPreferredLifttime] ${err.message}`));
+
+}
+
 function getUserByNameAndNumber(pool, name, phone_number) {
     let query = {
         text: "SELECT * FROM users WHERE username = $1 AND phone_number = $2;",
@@ -89,7 +102,7 @@ function getUserByNameAndNumber(pool, name, phone_number) {
             return retData;
         })
         .catch((err) => {
-            console.error(err);
+            console.error(`[getUserByNameAndNumber] Error: ${err.message}`);
             retData = null;
         });
     // .finally(() => {
@@ -108,7 +121,7 @@ function getUserByName(pool, name) {
             return data;
         })
         .catch(e => {
-            console.error(e.stack);
+            console.error(`[getUserByName] - ${e.stack}`);
         })
         .finally(() => {
             console.log("Done with getUserByName query");
@@ -182,7 +195,7 @@ function createClient() {
 }
 
 // -------------------------- UPDATE FUNCTIONS ----------------------------
-function updateUser(pool, userData){
+function updateUser(pool, userData) {
     let query = {
         text: 'UPDATE users SET "username" = $1, "phone_number" = $2, "team" = $3, "year" = $4, "lifttime" = $5, "roommates" = $6 WHERE "username" = $1;',
     }
@@ -204,45 +217,78 @@ function updateUser(pool, userData){
         });
 }
 
-function toggleAwake(pool, user){
+function toggleAwake(pool, user) {
     let query = {
         text: 'UPDATE users SET awake = NOT awake WHERE username = $1 RETURNING awake;'
     }
     let values = [user];
     return pool.query(query, values)
-    .then(res => {
-        console.log("Successful toggle awake");
-        return res.rows
-    })
-    .catch(err => console.error(err.message))
+        .then(res => {
+            console.log("Successful toggle awake");
+            return res.rows
+        })
+        .catch(err => console.error(`[toggleAwake] ${err.message}`))
 }
 
-function dangerousResetUsers(pool){
+function getBothLifttimes(pool, user) {
+    let query = {
+        text: "SELECT lifttime, today_lifttime FROM users WHERE username = $1;"
+    }
+    let values = [user]
+    return pool.query(query, values)
+        .then((res) => {
+            var firstResult = res.rows[0];
+            console.log(`[getBothLifttime] Results: ${res.rows}`)
+            console.dir(res.rows[0]);
+            return firstResult;
+        })
+        .catch(err => console.error(`[getBothlfittimes] Error: ${err.message}`))
+}
+
+function setTodayLifttime(pool, user, today_lifttime) {
+    let query = {
+        text: 'UPDATE users SET today_lifttime = $1 WHERE username = $2 RETURNING today_lifttime;'
+    }
+    let values = [today_lifttime, user]
+    return pool.query(query, values)
+        .then(res => {
+            console.log(`[setTodayLifttime] - Successful update.`);
+            let updatedTodayLifttime = res.rows[0]['today_lifttime']
+            return {'successful_query':true, 'updated_today_lifttime':updatedTodayLifttime}
+        })
+        .catch(err => {
+            console.log(`[setTodaylifttime] - Query error`);
+            console.error(err.message);
+            return {'successful_query':false}
+        })
+}
+
+function dangerousResetUsers(pool) {
     let query = {
         text: "DELETE FROM users;"
     }
     pool.query(query)
-    .then(res => console.log("Successfully deleted all records in users table."))
-    .catch(e => console.error(e.message))
-    .finally(() => {
-        console.log("Done with dangerousResetUsers query");
-        pool.end();
-    })
+        .then(res => console.log("Successfully deleted all records in users table."))
+        .catch(e => console.error(e.message))
+        .finally(() => {
+            console.log("Done with dangerousResetUsers query");
+            pool.end();
+        })
 }
 
-function sandbox(pool){
+function sandbox(pool) {
     let query = {
         text: 'SELECT * FROM users;'
     }
     pool.query(query)
-    .then((res) => {
-        res.rows.map(x => console.log(x));
-    })
-    .catch((e) => console.error(e.message));
+        .then((res) => {
+            res.rows.map(x => console.log(x));
+        })
+        .catch((e) => console.error(e.message));
 }
 
 if (require.main === module) {
-    sandbox(pool);
+    createTables(pool);
     // // var teamData = require("./teamdata.json");
     // // for(let row in teamData){
     // //     createNewUser(teamData[row]);
@@ -287,3 +333,6 @@ module.exports.createNewUser = createNewUser;
 module.exports.getUserByName = getUserByName;
 module.exports.updateUser = updateUser;
 module.exports.toggleAwake = toggleAwake;
+module.exports.getPreferredLifttimeByName = getPreferredLifttimeByName;
+module.exports.getBothLifttimes = getBothLifttimes;
+module.exports.setTodayLifttime = setTodayLifttime;

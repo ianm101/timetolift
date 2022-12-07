@@ -54,6 +54,7 @@ console.log(`Dirname: ${__dirname}`);
 app.use(express.static(__dirname));
 
 app.get("/", (req, res) => {
+    
     // Send JSON
     //res.json({message: "Error"});
 
@@ -61,46 +62,27 @@ app.get("/", (req, res) => {
     // res.render("index");
 
     // Pass data into views (html/ejs files) with render()'s second parameter
-    res.render("landing");
-});
-
-// User authentication
-app.post('/auth', urlencodedParser, (req, res) => {
-    console.log(Object.keys(req.body));
-    let username = req.body['signin-name'];
-    let phone_number = req.body['signin-phone_number'];
-
-    console.log(`Username: ${username}`);
-    if (username && phone_number) {
-        try {
-            var existingUsers = dbm.getUserByNameAndNumber(pool, username, phone_number);
-            console.log(existingUsers);
-            existingUsers
-                .then((data) => {
-                    console.log("THEN Promise");
-                    console.log(data[0]);
-                    console.log(data.length);
-
-                    // Existing user with these credentials case
-                    if (data.length > 0) {
-                        req.session.loggedin = true;
-                        req.session.username = username;
-                        console.log("Pre redirect");
-                        console.log("post redirect");
-                        return { "authStatus": "ok" };
-                    }
-                })
-                .catch((err) => {
-                    console.error(err);
-                });
-        } catch (e) {
-            console.error(e);
-        }
-    } else {
-        res.send("Please enter a username and phone number");
-        res.end();
+    if(req.session.loggedin){
+        console.log("Logged in '/'");
+        let username = req.session.user;
+        dbm.getBothLifttimes(pool, username)
+        .then((lifttimes) => {
+            let lift_time = lifttimes['lifttime'];
+            let today_lifttime = lifttimes['today_lifttime'];
+            console.log(`We are logged in, preferred lift time for ${username} is: ${lift_time}. Today's lifttime is ${today_lifttime}`);
+            res.render("index", {
+                message: `Welcome back, ${username}`,
+                messageClass: "alert-success",
+                userLifttime: lift_time,
+                userTodayLifttime: today_lifttime
+            });
+        });
+    }else{
+        console.log("not logged in");
+        res.render("landing");
     }
-})
+   
+});
 
 app.get("/landing", (req, res) => {
     res.render("landing");
@@ -200,11 +182,12 @@ app.post("/signin", urlencodedParser, (req, res) => {
             });
         } else {
             req.session.loggedin = true;
+            req.cookies.loggedin = true;
             req.session.user = name;
-            res.render("index", {
-                message: `Welcome back, ${name}`,
-                messageClass: 'alert-info'
-            });
+            req.cookies.user = name;
+            console.log("Cookies and session variables set");
+            console.log(`Session loggedin : ${req.session.loggedin}\nCookies loggedin : ${req.cookies.loggedin}\nSession user: ${req.session.user}\nCookies user: ${req.cookies.user}`);
+            res.redirect("/");
         }
     })
 
@@ -312,6 +295,20 @@ app.post("/toggle_user_awake", urlencodedParser, async (req, res) => {
         .finally(() => {console.log("this is a test")});  
     }
 });
+
+app.post("/set_today_lifttime", urlencodedParser, async (req, res) => {
+    let currentUser = req.session.user;
+    if (typeof currentUser === undefined){
+        res.render("signin", {
+            message: "No active user, please login.",
+            messageClass: "alert-danger"
+        })
+    } else {
+        let todayLifttime = req.body['today_time'];
+        dbm.setTodayLifttime(pool, currentUser, todayLifttime)
+        .then(res => {console.dir(res)})
+    }
+})
 let port = 3000;
 console.log(`listening on port ${port}`);
 app.listen(port);

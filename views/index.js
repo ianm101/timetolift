@@ -50,11 +50,36 @@ $(document).ready(function () {
     });
 });
 
-// Change text depending on state
+// Change selected lift time
 $(document).ready(function () {
-    $("#testbutton").click(function () {
-        var temp = $("template");
-        var clone = temp.html();
-        $("#roommate-card-container").append(clone);
-    });
+    if(userTodayLifttime === '7:30'){
+        $("#730btn").addClass("button-active");
+    }else{
+        $("#830btn").addClass("button-active");
+    }
+})
+
+// Update user lifttime 
+$(document).ready(function() {
+    $(".lifttime-btn").click(() => {
+        let btnTime;
+        console.log("LOOK HERE");
+        console.dir($(this));
+        if($(this).attr("id") === "730btn"){
+            btnTime = "7:30";
+        }else{
+            btnTime = "8:30";
+        }
+        console.log(`BtnTime: ${btnTime}`)
+
+        $.ajax({
+            type: "POST",
+            url: "/set_today_lifttime",
+            data: {
+                'today_time':btnTime
+            },
+            dataType: "json",
+            encode: true
+        }).done((data) => console.dir(data))
+    })
 })

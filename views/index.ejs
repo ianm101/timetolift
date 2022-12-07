@@ -24,10 +24,10 @@
         </div>
         <!--Selectable lift types-->
         <div class="hflex">
-          <div class="jumbotron hflex-item button">
+          <div class="jumbotron hflex-item button lifttime-btn" id="730btn">
             <p>7:30</p>
           </div>
-          <div class="jumbotron hflex-item button">
+          <div class="jumbotron hflex-item button lifttime-btn" id="830btn">
             <p>8:30</p>
           </div>
         </div>
@@ -54,6 +54,12 @@
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
         <script src="../views/index.js"></script>
+        <% if(typeof userLifttime !==undefined) { %>
+          <script>
+              var userLifttime = '<%- JSON.stringify(locals.userLifttime).slice(1,-1) %>'
+              var userTodayLifttime = '<%- JSON.stringify(locals.userTodayLifttime).slice(1, -1) %>'
+          </script>
+          <% } %>
 
 </body>
 
