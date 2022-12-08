@@ -61,22 +61,34 @@ $(document).ready(function () {
 
 // Update user lifttime 
 $(document).ready(function() {
-    $(".lifttime-btn").click(() => {
+    $(".lifttime-btn").click((e) => {
         let btnTime;
         console.log("LOOK HERE");
-        console.dir($(this));
-        if($(this).attr("id") === "730btn"){
-            btnTime = "7:30";
-        }else{
-            btnTime = "8:30";
+        let target = $(e.target);
+        console.dir(target);
+        console.log(target.prop("tagName"));
+        // if div was clicked
+        if(target.prop("tagName") === "DIV"){
+            btnTime = target.attr("id");
+            console.log(`Div clicked, id is ${btnTime}`);
+        }else if(target.prop("tagName") === "P"){
+            let divParent = target.parent("div");
+            console.log(`P tag clicked, id of div parent is: ${divParent.attr("id")}`);
+            btnTime = divParent.attr("id");
         }
-        console.log(`BtnTime: ${btnTime}`)
+        let time;
+        if(btnTime === "730btn"){
+            time = "7:30";
+        }else{
+            time = "8:30";
+        }
+        console.log(`BtnTime: ${time}`)
 
         $.ajax({
             type: "POST",
             url: "/set_today_lifttime",
             data: {
-                'today_time':btnTime
+                'today_time':time
             },
             dataType: "json",
             encode: true

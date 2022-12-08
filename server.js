@@ -7,7 +7,6 @@ const crypto = require("crypto");
 
 const app = express();
 const dbm = require("./db_methods");
-const { url } = require("inspector");
 const pool = dbm.pool;
 
 
@@ -54,7 +53,7 @@ console.log(`Dirname: ${__dirname}`);
 app.use(express.static(__dirname));
 
 app.get("/", (req, res) => {
-    
+
     // Send JSON
     //res.json({message: "Error"});
 
@@ -62,26 +61,26 @@ app.get("/", (req, res) => {
     // res.render("index");
 
     // Pass data into views (html/ejs files) with render()'s second parameter
-    if(req.session.loggedin){
+    if (req.session.loggedin) {
         console.log("Logged in '/'");
         let username = req.session.user;
         dbm.getBothLifttimes(pool, username)
-        .then((lifttimes) => {
-            let lift_time = lifttimes['lifttime'];
-            let today_lifttime = lifttimes['today_lifttime'];
-            console.log(`We are logged in, preferred lift time for ${username} is: ${lift_time}. Today's lifttime is ${today_lifttime}`);
-            res.render("index", {
-                message: `Welcome back, ${username}`,
-                messageClass: "alert-success",
-                userLifttime: lift_time,
-                userTodayLifttime: today_lifttime
+            .then((lifttimes) => {
+                let lift_time = lifttimes['lifttime'];
+                let today_lifttime = lifttimes['today_lifttime'];
+                console.log(`We are logged in, preferred lift time for ${username} is: ${lift_time}. Today's lifttime is ${today_lifttime}`);
+                res.render("index", {
+                    message: `Welcome back, ${username}`,
+                    messageClass: "alert-success",
+                    userLifttime: lift_time,
+                    userTodayLifttime: today_lifttime
+                });
             });
-        });
-    }else{
+    } else {
         console.log("not logged in");
         res.render("landing");
     }
-   
+
 });
 
 app.get("/landing", (req, res) => {
@@ -161,7 +160,7 @@ app.post("/profile", urlencodedParser, (req, res) => {
                     });
                 });
             })
-            .catch((err) => console.error(err.message));
+                .catch((err) => console.error(err.message));
 
         })
 
@@ -248,7 +247,24 @@ app.post("/register", urlencodedParser, (req, res) => {
 })
 
 app.get("/team", async (req, res) => {
-    res.render("teamview");
+    let currentUser = req.session.user;
+    if (typeof currentUser === undefined) {
+        res.render("signin", {
+            message: "No active user. Please login",
+            messageClass: "alert-danger"
+        })
+    } else {
+        let currentUserTeam = dbm.getTeamOfUser(pool, currentUser);
+        currentUserTeam.then(queryResult => {
+            console.log(`[/team] userTeam: ${queryResult}`);
+            console.dir(userTeam);
+            let team = userTeam[0]['team'];
+            res.render("teamview", {
+                userTeam: team
+            });
+
+        })
+    }
 });
 
 // AJAX
@@ -286,19 +302,19 @@ app.post("/toggle_user_awake", urlencodedParser, async (req, res) => {
         })
     } else {
         dbm.toggleAwake(pool, currentUser)
-        .then((queryData) => {
-            console.log("In Server");
-            let isAwake = queryData[0]['awake'];
-            res.send({'query_success':true, 'isAwake':isAwake});
-        })
-        .catch(err => console.error(err.message))
-        .finally(() => {console.log("this is a test")});  
+            .then((queryData) => {
+                console.log("In Server");
+                let isAwake = queryData[0]['awake'];
+                res.send({ 'query_success': true, 'isAwake': isAwake });
+            })
+            .catch(err => console.error(err.message))
+            .finally(() => { console.log("this is a test") });
     }
 });
 
 app.post("/set_today_lifttime", urlencodedParser, async (req, res) => {
     let currentUser = req.session.user;
-    if (typeof currentUser === undefined){
+    if (typeof currentUser === undefined) {
         res.render("signin", {
             message: "No active user, please login.",
             messageClass: "alert-danger"
@@ -306,7 +322,7 @@ app.post("/set_today_lifttime", urlencodedParser, async (req, res) => {
     } else {
         let todayLifttime = req.body['today_time'];
         dbm.setTodayLifttime(pool, currentUser, todayLifttime)
-        .then(res => {console.dir(res)})
+            .then(res => { console.dir(res) })
     }
 })
 let port = 3000;

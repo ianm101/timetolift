@@ -163,6 +163,19 @@ function getUsersByClassYear(client, classYear) {
         });
 }
 
+function getTeamOfUser(pool, user){
+    let query = {
+        text: "SELECT team FROM users WHERE username = $1;"
+    }
+    let values = [user];
+    return pool.query(query, values)
+    .then(res => {
+        const data = res.rows;
+        return data;
+    })
+    .catch(e => console.error(`[getTeamOfUser] Query error: ${e.message}`));
+}
+
 function getAllUsersByTeam(pool, team) {
     let query = {
         text: 'SELECT * FROM users WHERE team = $1',
@@ -336,3 +349,4 @@ module.exports.toggleAwake = toggleAwake;
 module.exports.getPreferredLifttimeByName = getPreferredLifttimeByName;
 module.exports.getBothLifttimes = getBothLifttimes;
 module.exports.setTodayLifttime = setTodayLifttime;
+module.exports.getTeamOfUser = getTeamOfUser;
