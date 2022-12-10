@@ -93,3 +93,28 @@ body {
     font-size: 20px;
 }
 
+/* Team View stuff */
+.thumbnail-img {
+    width: 30px;
+    height: 30px;
+    border-radius: 25%;
+}
+
+.class-container{
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+}
+
+.teammate-row {
+    border-style: solid;
+    border-radius: 5px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 10px;
+    margin-top: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 2px;
+}

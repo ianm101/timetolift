@@ -68,6 +68,8 @@ app.get("/", (req, res) => {
             .then((lifttimes) => {
                 let lift_time = lifttimes['lifttime'];
                 let today_lifttime = lifttimes['today_lifttime'];
+                console.log(`/: Lift Time: ${lift_time}`);
+                console.log(`/: today lifttime: ${today_lifttime}`);
                 console.log(`We are logged in, preferred lift time for ${username} is: ${lift_time}. Today's lifttime is ${today_lifttime}`);
                 res.render("index", {
                     message: `Welcome back, ${username}`,
@@ -76,7 +78,24 @@ app.get("/", (req, res) => {
                     userTodayLifttime: today_lifttime
                 });
             });
-    } else {
+    } else if(req.cookies.loggedin){
+        console.log("Logged in (cookies edition)");
+        let username = req.cookies.user;
+        dbm.getBothLifttimes(pool, username)
+            .then((lifttimes) => {
+                let lift_time = lifttimes['lifttime'];
+                let today_lifttime = lifttimes['today_lifttime'];
+                console.log(`/: Lift Time: ${lift_time}`);
+                console.log(`/: today lifttime: ${today_lifttime}`);
+                console.log(`We are logged in, preferred lift time for ${username} is: ${lift_time}. Today's lifttime is ${today_lifttime}`);
+                res.render("index", {
+                    message: `Welcome back, ${username}`,
+                    messageClass: "alert-success",
+                    userLifttime: lift_time,
+                    userTodayLifttime: today_lifttime
+                });
+            });
+    }else{
         console.log("not logged in");
         res.render("landing");
     }
@@ -246,7 +265,7 @@ app.post("/register", urlencodedParser, (req, res) => {
 
 })
 
-app.get("/team", async (req, res) => {
+app.get("/team", (req, res) => {
     let currentUser = req.session.user;
     if (typeof currentUser === undefined) {
         res.render("signin", {
@@ -257,11 +276,51 @@ app.get("/team", async (req, res) => {
         let currentUserTeam = dbm.getTeamOfUser(pool, currentUser);
         currentUserTeam.then(queryResult => {
             console.log(`[/team] userTeam: ${queryResult}`);
-            console.dir(userTeam);
-            let team = userTeam[0]['team'];
-            res.render("teamview", {
-                userTeam: team
-            });
+            console.dir(queryResult);
+            let team = queryResult[0]['team'];
+
+            let teammates = dbm.getAllUsersByTeam(pool, team);
+            teammates.then(allTeammates => {
+                let teammatesByClass = {
+                    'freshmen':[],
+                    'sophomores':[],
+                    'juniors':[],
+                    'seniors':[],
+                    'unclassified':[]
+                }
+                for(let i = 0; i < allTeammates.length; i++){
+                    let iterYear = allTeammates[i]['year'];
+                    switch(iterYear){
+                        case "freshman":
+                            teammatesByClass['freshmen'].push(allTeammates[i]);
+                            break;
+                        case "sophomore":
+                            teammatesByClass['sophomores'].push(allTeammates[i]);
+                            break;
+                        case "junior":
+                            teammatesByClass['juniors'].push(allTeammates[i]);
+                            break;
+                        case "senior":
+                            teammatesByClass['seniors'].push(allTeammates[i]);
+                            break;
+                        default:
+                            teammatesByClass['unclassified'].push(allTeammates[i]);
+                    }
+                }
+                console.log('all teammates');
+                console.dir(teammatesByClass);
+
+                res.render("teamview", {
+                    teamName: team,
+                    team: {
+                    freshmen: teammatesByClass['freshmen'],
+                    sophomores: teammatesByClass['sophomores'],
+                    juniors: teammatesByClass['juniors'],
+                    seniors: teammatesByClass['seniors']
+                    }
+                });
+            })
+            
 
         })
     }
@@ -303,12 +362,11 @@ app.post("/toggle_user_awake", urlencodedParser, async (req, res) => {
     } else {
         dbm.toggleAwake(pool, currentUser)
             .then((queryData) => {
-                console.log("In Server");
                 let isAwake = queryData[0]['awake'];
+                console.log(`User ${currentUser} is ${isAwake ? 'awake' : 'not awake'}.`);
                 res.send({ 'query_success': true, 'isAwake': isAwake });
             })
             .catch(err => console.error(err.message))
-            .finally(() => { console.log("this is a test") });
     }
 });
 

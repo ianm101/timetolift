@@ -2,10 +2,24 @@
 <html>
     <head>
         <title>[TTL] Team View</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="../views/styles/styles.css">
     </head>
     <body>
         <!--Render list of all users separated by team-->
+        <div class="hflex">
+            Team: <%= locals.teamName %>
+        </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
         <script src="/views/teamview.js" type="application/javascript"></script>
+        <% if(typeof teamName !== undefined){ %>
+        <script>
+        var teamName = '<%- JSON.stringify(locals.teamName).slice(1,-1) %>';
+        var team = '<%- JSON.stringify(locals.team) %>';
+        </script>
+        <% } else { %>
+        <% console.log("Either team or byClass is undefined"); %>
+        <% } %>
     </body>
 </html>
