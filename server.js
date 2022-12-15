@@ -393,4 +393,4 @@ app.post("/set_today_lifttime", urlencodedParser, async (req, res) => {
 })
 let port = 3000;
 console.log(`listening on port ${port}`);
-app.listen(port);
+app.listen(process.env.PORT || port);
