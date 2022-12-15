@@ -289,6 +289,24 @@ function dangerousResetUsers(pool) {
         })
 }
 
+function dangerousDeleteUser(pool, user, phone_number=""){
+    let queryString;
+    let values;
+    if(phone_number !== ""){
+        queryString = `DELETE FROM users WHERE username = $1 AND phone_number = $2;`
+        values = [user, phone_number];
+    }else{
+        queryString = `DELETE FROM users WHERE username = $1;`;
+        values = [user];
+    }
+    pool.query(queryString, values)
+    .then(res => {
+        console.log("Deleted user from database");
+    }).catch(e => {
+        console.error(`[dangerousDeleteUser] Error: ${e.message}`);
+    })
+}
+
 function sandbox(pool) {
     let query = {
         text: 'SELECT * FROM users;'
@@ -301,7 +319,7 @@ function sandbox(pool) {
 }
 
 if (require.main === module) {
-    dangerousResetUsers(pool);
+    dangerousDeleteUser(pool, "David Smythe", "757-289-9222");
     // // var teamData = require("./teamdata.json");
     // // for(let row in teamData){
     // //     createNewUser(teamData[row]);
