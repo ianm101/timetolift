@@ -278,7 +278,7 @@ function setTodayLifttime(pool, user, today_lifttime) {
 
 function dangerousResetUsers(pool) {
     let query = {
-        text: "DELETE FROM users;"
+        text: "DELETE FROM ONLY users;"
     }
     pool.query(query)
         .then(res => console.log("Successfully deleted all records in users table."))
@@ -301,7 +301,7 @@ function sandbox(pool) {
 }
 
 if (require.main === module) {
-    createTables(pool);
+    dangerousResetUsers(pool);
     // // var teamData = require("./teamdata.json");
     // // for(let row in teamData){
     // //     createNewUser(teamData[row]);
