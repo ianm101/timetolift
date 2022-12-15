@@ -49,30 +49,20 @@ function createNewUser(client, userData) {
 }
 
 /* ---------------------- QUERY FUNCTIONS -------------------- */
-function getAllUsers(client) {
-    console.log("LORDY!");
+function getAllUsers(pool) {
     let query = {
         text: "SELECT * FROM users;",
-        rowMode: 'array'
     };
-    let retData;
-    client.query(query).then(
+    return pool.query(query).then(
         (res) => {
             const data = res.rows;
-            console.log("All users.");
-            retData = data;
+            return data
         }
     )
         .catch(e => {
             console.log("Error");
-            console.error(e.stack);
-        })
-        .finally(() => {
-            console.log("CLIENT END");
+            console.error(`[getAllUsers] Error: ${e.message}`);
         });
-    console.log("ANOTHER ONE");
-    console.log(`retdata: ${retData}`);
-    return retData;
 }
 
 function getPreferredLifttimeByName(pool, name) {
@@ -319,7 +309,11 @@ function sandbox(pool) {
 }
 
 if (require.main === module) {
-    dangerousDeleteUser(pool, "David Smythe", "757-289-9222");
+    dangerousDeleteUser(pool, "David Smythe ", "757-289-9222");
+    getAllUsers(pool)
+    .then(res => {
+        console.dir(res);
+    });
     // // var teamData = require("./teamdata.json");
     // // for(let row in teamData){
     // //     createNewUser(teamData[row]);
