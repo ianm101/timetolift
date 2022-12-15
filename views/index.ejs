@@ -17,8 +17,7 @@
       <%= locals.message %>
     </div>
     <% } %>
-      <a href="/profile" class="profile-link">Profile</a>
-      <a href="/team" class="profile-link">Team</a>
+    <%- include('navbar.ejs') %>
       <div class="container">
         <div class="jumbotron">
           <h1 class="textbox">Lifts Today</h1>
@@ -34,7 +33,7 @@
         </div>
 
         <!--Main "I AM AWAKE" button-->
-        <div class="jumbotron button not-awake" id="main-awake-button">
+        <div class="jumbotron button not-awake button-active" id="main-awake-button">
           <p>I'M ASLEEP</p>
         </div>
         <div class="hflex-center">
@@ -55,7 +54,7 @@
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
         <script src="../views/index.js"></script>
-        <% if(typeof userLifttime !==undefined) { %>
+        <% if(locals.userLifttime && locals.userTodayLifttime) { %>
           <script>
               var userLifttime = '<%- JSON.stringify(locals.userLifttime).slice(1,-1) %>'
               var userTodayLifttime = '<%- JSON.stringify(locals.userTodayLifttime).slice(1, -1) %>'

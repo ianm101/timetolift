@@ -1,6 +1,7 @@
 $(document).ready(function(){
     $("#registration-form").submit(function(event){
         console.log(window.location);
+        
 //         var formData = {
 //             name: $('input[name="reg-name"]').val(),
 //             phone_number: $('input[name="reg-phone_number"]').val(),

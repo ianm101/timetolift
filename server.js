@@ -116,9 +116,17 @@ app.get("/signin", (req, res) => {
         });
     }
 })
+
+app.get("/signout", (req, res) => {
+    if(req.session.loggedin){
+        req.session.loggedin = false;
+        req.session.user = undefined;
+        res.redirect("/landing");
+    }
+})
 app.get("/profile", (req, res) => {
     let currentUser = req.session.user;
-    if (typeof currentUser === undefined) {
+    if (!currentUser) {
         res.render("signin", {
             message: "No active user. Please login",
             messageClass: "alert-danger"
@@ -147,7 +155,7 @@ app.get("/profile", (req, res) => {
 })
 app.post("/profile", urlencodedParser, (req, res) => {
     let currentUser = req.session.user;
-    if (typeof currentUser === undefined) {
+    if (!currentUser) {
         res.render("signin", {
             message: "No active user. Please login",
             messageClass: "alert-danger"
@@ -251,7 +259,7 @@ app.post("/register", urlencodedParser, (req, res) => {
         }
         // Otherwise, we already have a user with this information. Alert them
         else {
-            res.render('signin', 200, {
+            res.render('signin', {
                 message: 'User with this information is already registered.',
                 messageClass: 'alert-danger'
             });
@@ -267,7 +275,7 @@ app.post("/register", urlencodedParser, (req, res) => {
 
 app.get("/team", (req, res) => {
     let currentUser = req.session.user;
-    if (typeof currentUser === undefined) {
+    if (!currentUser) {
         res.render("signin", {
             message: "No active user. Please login",
             messageClass: "alert-danger"
@@ -354,7 +362,7 @@ app.get("/get_all_by_team", async (req, res) => {
 
 app.post("/toggle_user_awake", urlencodedParser, async (req, res) => {
     let currentUser = req.session.user;
-    if (typeof currentUser === undefined) {
+    if (!currentUser) {
         res.render("signin", {
             message: "No active user. Please login",
             messageClass: "alert-danger"
@@ -372,7 +380,7 @@ app.post("/toggle_user_awake", urlencodedParser, async (req, res) => {
 
 app.post("/set_today_lifttime", urlencodedParser, async (req, res) => {
     let currentUser = req.session.user;
-    if (typeof currentUser === undefined) {
+    if (!currentUser) {
         res.render("signin", {
             message: "No active user, please login.",
             messageClass: "alert-danger"

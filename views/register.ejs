@@ -6,8 +6,8 @@
         TimeToLift
     </title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="../views/styles/styles.css">
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="../views/styles/styles.css">
 </head>
 
 <body>
@@ -16,24 +16,37 @@
             <%= locals.message %>
         </div>
         <% } %>
-            <form id="registration-form" method="POST" action="/register">
-                <label for="reg-name">Name:</label>
-                <input name="reg-name">
-                <label for="reg-phone_number">Phone Number</label>
-                <input name="reg-phone_number">
-                <label for="reg-team">Team:</label>
-                <select name="reg-team">
-                    <option value="mlx">MLX</option>
-                </select>
-                <label for="reg-year">Year:</label>
-                <select name="reg-year">
-                    <option value="freshman">Freshman</option>
-                    <option value="sophomore">Sophomore</option>
-                    <option value="junior">Junior</option>
-                    <option value="senior">Senior</option>
-                </select>
-                <button type="submit">Submit</button>
-            </form>
+            <div class="register-form">
+                <form id="registration-form" method="POST" action="/register">
+                    <div class="vflex">
+                        <div class="register-form-pair">
+                            <label for="reg-name">NAME</label>
+                            <input name="reg-name">
+                        </div>
+                        <div class="register-form-pair">
+                            <label for="reg-phone_number">PHONE NUMBER</label>
+                            <input name="reg-phone_number">
+                        </div>
+                        <div class="register-form-pair">
+                            <label for="reg-team">TEAM</label>
+                            <select name="reg-team">
+                                <option value="mlx">MLX</option>
+                            </select>
+                        </div>
+                        <div class="register-form-pair">
+                            <label for="reg-year">YEAR</label>
+                            <select name="reg-year">
+                                <option value="freshman">Freshman</option>
+                                <option value="sophomore">Sophomore</option>
+                                <option value="junior">Junior</option>
+                                <option value="senior">Senior</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="register-form-submit">CREATE ACCOUNT</button>
+                    </div>
+
+                </form>
+            </div>
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
             <script src="/views/register.js" type="application/javascript"></script>
 </body>

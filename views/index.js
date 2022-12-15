@@ -52,15 +52,17 @@ $(document).ready(function () {
 
 // Change selected lift time
 $(document).ready(function () {
-    if(userTodayLifttime === '7:30'){
-        $("#730btn").addClass("button-active");
-    }else{
-        $("#830btn").addClass("button-active");
+    if (userTodayLifttime){
+        if (userTodayLifttime === '7:30') {
+            $("#730btn").addClass("button-active");
+        } else {
+            $("#830btn").addClass("button-active");
+        }
     }
 })
 
 // Update user lifttime 
-$(document).ready(function() {
+$(document).ready(function () {
     $(".lifttime-btn").click((e) => {
         let btnTime;
         console.log("LOOK HERE");
@@ -68,18 +70,18 @@ $(document).ready(function() {
         console.dir(target);
         console.log(target.prop("tagName"));
         // if div was clicked
-        if(target.prop("tagName") === "DIV"){
+        if (target.prop("tagName") === "DIV") {
             btnTime = target.attr("id");
             console.log(`Div clicked, id is ${btnTime}`);
-        }else if(target.prop("tagName") === "P"){
+        } else if (target.prop("tagName") === "P") {
             let divParent = target.parent("div");
             console.log(`P tag clicked, id of div parent is: ${divParent.attr("id")}`);
             btnTime = divParent.attr("id");
         }
         let time;
-        if(btnTime === "730btn"){
+        if (btnTime === "730btn") {
             time = "7:30";
-        }else{
+        } else {
             time = "8:30";
         }
         console.log(`BtnTime: ${time}`)
@@ -88,7 +90,7 @@ $(document).ready(function() {
             type: "POST",
             url: "/set_today_lifttime",
             data: {
-                'today_time':time
+                'today_time': time
             },
             dataType: "json",
             encode: true

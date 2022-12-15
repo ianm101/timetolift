@@ -1,26 +1,39 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>[TTL] Sign-in</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="../views/styles/styles.css">
-    </head>
-    <body>
-        <% if(locals.message){ %>
+
+<head>
+    <title>[TTL] Sign-in</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="../views/styles/styles.css">
+</head>
+
+<body>
+    <% if(locals.message){ %>
         <div class="alert <%= locals.messageClass %>" role="alert">
             <%= locals.message %>
         </div>
         <% } %>
-        <form id="signin-form" method="POST" action="/signin">
-            <label for="signin-name">Name</label>
-            <input name="signin-name">
-            <label for="signin-phone_number">Phone Number</label>
-            <input name="signin-phone_number">
-            <button type="submit">Log in</button>
-        </form>
+            <div>
+                <form id="signin-form" method="POST" action="/signin" class="login-form">
+                    <div>
+                        <div class="signin-form-pair">
+                            <label for="signin-name" class="signin-form-pair-item">NAME</label>
+                            <input name="signin-name" class="signin-form-pair-item">
+                        </div>
+                        <div class="signin-form-pair">
+                            <label for="signin-phone_number" class="signin-form-pair-item">PHONE NUMBER</label>
+                            <input name="signin-phone_number" class="signin-form-pair-item">
+                        </div>
+                    </div>
+                    <div class="signin-form-pair signin-submit">
+                        <button type="submit" class="signin-form-submit">LOG IN</button>
+                    </div>
+                </form>
+            </div>
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-        <script src="/views/signin.js" type="application/javascript"></script>
-    </body>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+            <script src="/views/signin.js" type="application/javascript"></script>
+</body>
+
 </html>

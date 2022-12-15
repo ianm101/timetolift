@@ -7,8 +7,9 @@
     <link rel="stylesheet" href="../views/styles/styles.css">
     </head>
     <body>
+        <%- include('navbar.ejs') %>
         <!--Render list of all users separated by team-->
-        <div class="hflex">
+        <div class="hflex teamname-container">
             Team: <%= locals.teamName %>
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>

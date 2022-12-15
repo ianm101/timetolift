@@ -36,7 +36,18 @@ $(document).ready(function(){
 
     //     $('body').append(classContainerDiv);
     // }
+    
+    // toggle show/hide the contents on click
+    
 });
+
+$(document).ready(function(){
+    console.log(`Here: ${$('.class-container-header').length}`)
+    $(".class-container-header").click(function(){
+        // get all teammate-rows in this div and toggle hide/show
+        $(this).parent(".class-container").children(".teammate-row").toggle(500);
+    })
+})
 
 function buildClassContainerDiv(userClass){
     var templateString = `<div class='class-container vflex'>
