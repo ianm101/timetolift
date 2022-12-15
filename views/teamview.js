@@ -66,10 +66,14 @@ function buildDivFromUser(user){
 
     var templateString = `
     <div class='teammate-row hflex'>
+    <div class='hflex flex-grow'>
     <div class='thumbnail-img ${awakeStatusClass}'></div>
     <div class='thumbnail-name'>${name}</div>
-    <div class='thumbnail-lifttime'>Going to ${lifttime}</div>
+    </div>
+    <div class='hflex flex-grow'>
+    <div class='thumbnail-lifttime'>${lifttime}</div>
     <a href='tel:+${phone_number} class='thumbnail-phonenumber'>${phone_number}</div>
+    </div>
     </div>
     `;
     var userDiv = $($.parseHTML(templateString));
