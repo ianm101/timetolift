@@ -233,6 +233,18 @@ function toggleAwake(pool, user) {
         .catch(err => console.error(`[toggleAwake] ${err.message}`))
 }
 
+function putAllAsleep(pool){
+    let query = {
+        text: 'UPDATE users SET awake = false;'
+    }
+    return pool.query(query)
+    .then(res => {
+        console.log(`[putAllAsleep] Successful reset awake.`);
+        return res.rows;
+    })
+    .catch(err => console.error(`[putAllAsleep] Error: ${err.message}`))
+}
+
 function getBothLifttimes(pool, user) {
     let query = {
         text: "SELECT lifttime, today_lifttime FROM users WHERE username = $1;"
@@ -309,11 +321,7 @@ function sandbox(pool) {
 }
 
 if (require.main === module) {
-    dangerousDeleteUser(pool, "David Smythe ", "757-289-9222");
-    getAllUsers(pool)
-    .then(res => {
-        console.dir(res);
-    });
+    putAllAsleep(pool);
     // // var teamData = require("./teamdata.json");
     // // for(let row in teamData){
     // //     createNewUser(teamData[row]);
@@ -362,3 +370,4 @@ module.exports.getPreferredLifttimeByName = getPreferredLifttimeByName;
 module.exports.getBothLifttimes = getBothLifttimes;
 module.exports.setTodayLifttime = setTodayLifttime;
 module.exports.getTeamOfUser = getTeamOfUser;
+module.exports.putAllAsleep = putAllAsleep;
