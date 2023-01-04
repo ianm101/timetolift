@@ -97,3 +97,17 @@ $(document).ready(function () {
         }).done((data) => console.dir(data))
     })
 })
+
+// Load roommates
+// $(document).ready(function() {
+//     console.log("Index.js load roommates")
+//     $.get("/get_all_roommates").done(data => function(){
+//         console.dir(data);
+//        // createRoommates(data)
+//     });
+// });
+
+function createRoommates(data){
+    console.log("DAta in createroommates");
+    console.dir(data);
+}

@@ -78,7 +78,7 @@ app.get("/", (req, res) => {
                     userTodayLifttime: today_lifttime
                 });
             });
-    } else if(req.cookies.loggedin){
+    } else if (req.cookies.loggedin) {
         console.log("Logged in (cookies edition)");
         let username = req.cookies.user;
         dbm.getBothLifttimes(pool, username)
@@ -95,7 +95,7 @@ app.get("/", (req, res) => {
                     userTodayLifttime: today_lifttime
                 });
             });
-    }else{
+    } else {
         console.log("not logged in");
         res.render("landing");
     }
@@ -118,7 +118,7 @@ app.get("/signin", (req, res) => {
 })
 
 app.get("/signout", (req, res) => {
-    if(req.session.loggedin){
+    if (req.session.loggedin) {
         req.session.loggedin = false;
         req.session.user = undefined;
         res.redirect("/landing");
@@ -132,27 +132,67 @@ app.get("/profile", (req, res) => {
             messageClass: "alert-danger"
         })
     } else {
-        let queriedUser = dbm.getUserByName(pool, currentUser);
-        queriedUser.then((data) => {
-            console.log("Profile")
-            let userData = data[0];
-            let allTeammates = dbm.getAllUsersByTeam(pool, userData['team']);
-            allTeammates.then((allTeammatesData) => {
-                res.render("profile", {
-                    user: currentUser,
-                    dataName: userData['username'],
-                    dataPhoneNumber: userData['phone_number'],
-                    dataYear: userData['year'],
-                    dataTeam: userData['team'],
-                    dataRoommates: userData['roommates'],
-                    dataLifttime: userData['lifttime'],
-                    dataAllTeammates: Object.values(allTeammatesData)
-                });
-            });
+        let all_rooms_promise = dbm.getAllRooms(pool);
+        // let queriedUser = dbm.getUserByName(pool, currentUser);
+        let all_rooms;
+        all_rooms_promise
+        // get all rooms that have been created 
+        .then((all_rooms_results) => {
+            console.log("In all rooms section");
+            all_rooms = all_rooms_results;
+            return dbm.getUserByName(pool, currentUser)
         })
+        .catch(e => console.error(`All rooms section: ${e.stack}`))
+        // get userData from session user
+        .then((userData) => {
+            
+            let finaldata = userData[0];
+            console.log("Into userData section");
+            console.dir(finaldata['name']);
+            console.dir(userData);
+
+            // Render page
+            res.render("profile", {
+                user: currentUser,
+                dataName: finaldata['username'],
+                dataPhoneNumber: finaldata['phone_number'],
+                dataYear: finaldata['year'],
+                dataTeam: finaldata['team'],
+                dataRoom: finaldata['room'],
+                dataLifttime: finaldata['lifttime'],
+                dataAllRooms: all_rooms
+            })
+            return "test";
+        })
+        .catch(e => console.error(`userdata section: ${e.stack}`));
+
+        // return dbm.getUserByName(pool, currentUser).then((finalData) => {
+        //     let userData = finalData[0];
+        //     console.log("All rooms res:");
+        //     console.dir(all_rooms_res);
+        //     console.dir(userData);
+            
+        // })
+
 
     }
-})
+    });
+    //     .then
+    // queriedUser.then((data) => {
+    //     console.log("Profile")
+    //     let userData = data[0];
+    //     res.render("profile", {
+    //         user: currentUser,
+    //         dataName: userData['username'],
+    //         dataPhoneNumber: userData['phone_number'],
+    //         dataYear: userData['year'],
+    //         dataTeam: userData['team'],
+    //         dataRoom: userData['room'],
+    //         dataLifttime: userData['lifttime'],
+    //     });
+    // });
+
+
 app.post("/profile", urlencodedParser, (req, res) => {
     let currentUser = req.session.user;
     if (!currentUser) {
@@ -290,15 +330,15 @@ app.get("/team", (req, res) => {
             let teammates = dbm.getAllUsersByTeam(pool, team);
             teammates.then(allTeammates => {
                 let teammatesByClass = {
-                    'freshmen':[],
-                    'sophomores':[],
-                    'juniors':[],
-                    'seniors':[],
-                    'unclassified':[]
+                    'freshmen': [],
+                    'sophomores': [],
+                    'juniors': [],
+                    'seniors': [],
+                    'unclassified': []
                 }
-                for(let i = 0; i < allTeammates.length; i++){
+                for (let i = 0; i < allTeammates.length; i++) {
                     let iterYear = allTeammates[i]['year'];
-                    switch(iterYear){
+                    switch (iterYear) {
                         case "freshman":
                             teammatesByClass['freshmen'].push(allTeammates[i]);
                             break;
@@ -321,14 +361,14 @@ app.get("/team", (req, res) => {
                 res.render("teamview", {
                     teamName: team,
                     team: {
-                    freshmen: teammatesByClass['freshmen'],
-                    sophomores: teammatesByClass['sophomores'],
-                    juniors: teammatesByClass['juniors'],
-                    seniors: teammatesByClass['seniors']
+                        freshmen: teammatesByClass['freshmen'],
+                        sophomores: teammatesByClass['sophomores'],
+                        juniors: teammatesByClass['juniors'],
+                        seniors: teammatesByClass['seniors']
                     }
                 });
             })
-            
+
 
         })
     }
@@ -389,6 +429,38 @@ app.post("/set_today_lifttime", urlencodedParser, async (req, res) => {
         let todayLifttime = req.body['today_time'];
         dbm.setTodayLifttime(pool, currentUser, todayLifttime)
             .then(res => { console.dir(res) })
+    }
+})
+
+app.get("/get_all_roommates", async (req, res) => {
+    let currentUser = req.session.user;
+    if (!currentUser) {
+        res.render("signin", {
+            message: "No active user, please login",
+            messageClass: "alert-danger"
+        })
+    } else {
+        dbm.getRoommatesByName(pool, currentUser)
+            .then(async (data) => {
+                let roommateList = data[0]['roommates'];
+                let roommateData = [];
+                // Check for 1 person case
+                console.dir(roommateList[0]);
+                if (roommateList[0].length > 1) {
+                    roommateList = roommateList[0];
+                }
+                await roommateList.forEach(element => {
+                    dbm.getUserByName(pool, element).then(results => {
+                        console.dir(results);
+                        roommateData.push(results[0]);
+                    });
+                });
+
+                console.log("roommate Data");
+                console.dir(roommateData);
+                res.send(roommateData);
+            })
+            .catch(e => console.error(`[/get_all_roommates] Server-side error: ${e.message}`));
     }
 })
 let port = 3000;

@@ -49,18 +49,20 @@
                                         <option value="8:30">8:30am</option>
                                     </select>
                                 </div>
-                                <div class="profile-form-pair" id="add-roommate-div">
-                                    <label for="roommate-datalist">ADD A ROOMMATE:</label>
-                                    <input list="all-roommates" id="roommate-datalist" name="roommate-datalist"
-                                        placeholder="Search for a teammate">
-                                    <datalist id="all-roommates">
-                                        <% if(locals.dataAllTeammates){ %>
-                                            <% let teammatesRaw=Object.values(locals.dataAllTeammates); %>
-                                                <% let teammates=Object.values(teammatesRaw); %>
-                                                    <% for(let i=0; i < teammates.length; i++) { %>
-                                                        <option value='<%- teammates[i].username %>'>
-                                                            <% } %>
-                                                                <% } %>
+                                
+                                <div class="profile-form-pair">
+                                    <label for="room-datalist">SELECT A ROOM (or create new):</label>
+                                    <input list="all-rooms" id="room-datalist" name="room-datalist" placeholder="Search for room">
+                                    <datalist id="all-rooms">
+                                        <% if(locals.dataAllRooms){ %>
+                                            <% let roomsRaw = Object.values(locals.dataAllRooms); %>
+                                            <% console.log("Rooms raw: "); %>
+                                            <% console.log(roomsRaw) %>
+                                            <% for(let i = 0; i < roomsRaw.length; i++) { %>
+                                                <% console.log(roomsRaw[i]) %>
+                                            <option value='<%- roomsRaw[i]["name"] %>'>
+                                            <% } %>
+                                        <% } %>
                                     </datalist>
                                 </div>
                                 <div class="hflex" id="roommate-alert-div">
